@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mflux-fasthtml"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = ["mflux", "flux", "flux.1", "image", "generator", "genai", "img2img", "mlx", "web", "gui", "ui"]
+authors = [
+  { name = "Anthony Wu", email = "please+file+gh+issue@users.noreply.github.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+  "mflux>=0.4.1,<1.0",
+  "click",
+]
+
+[project.urls]
+Documentation = "https://github.com/anthonywu/mflux-fasthtml#readme"
+Issues = "https://github.com/anthonywu/mflux-fasthtml/issues"
+Source = "https://github.com/anthonywu/mflux-fasthtml"
+
+[project.scripts]
+mflux-fasthtml = "mflux_fasthtml.cli:mflux_fasthtml"
+
+[tool.hatch.version]
+path = "src/mflux_fasthtml/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.13.0,<2.0",
+  "pytest>=8.3,<9.0"
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/mflux_fasthtml tests}"
+
+[tool.coverage.run]
+source_pkgs = ["mflux_fasthtml", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/mflux_fasthtml/__about__.py",
+]
+
+[tool.coverage.paths]
+mflux_fasthtml = ["src/mflux_fasthtml", "*/mflux-fasthtml/src/mflux_fasthtml"]
+tests = ["tests", "*/mflux-fasthtml/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
