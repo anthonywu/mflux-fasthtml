@@ -23,7 +23,10 @@ classifiers = [
 ]
 dependencies = [
   "mflux>=0.4.1,<1.0",
+  "python-fasthtml>=0.9.0,<1.0",
+  "fastcore>=1.7,<2.0",
   "click",
+  "uuid7",
 ]
 
 [project.urls]
@@ -32,7 +35,7 @@ Issues = "https://github.com/anthonywu/mflux-fasthtml/issues"
 Source = "https://github.com/anthonywu/mflux-fasthtml"
 
 [project.scripts]
-mflux-fasthtml = "mflux_fasthtml.cli:mflux_fasthtml"
+mflux-fasthtml-app = "mflux_fasthtml.app.main:run"  # fixme: does not start server for now
 
 [tool.hatch.version]
 path = "src/mflux_fasthtml/__about__.py"
@@ -62,4 +65,13 @@ exclude_lines = [
   "no cov",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
+]
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`) codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["BLE", "E4", "E7", "E9", "F", "I", "ICN", "LOG", "PERF", "W"]
+ignore = [
+  "F405", # ignore star imports
 ]

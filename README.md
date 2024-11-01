@@ -1,9 +1,9 @@
 # mflux-fasthtml
 
-A web app gui for [mflux](https://pypi.org/project/mflux/) python library implemented with [FastHTML](https://docs.fastht.ml)
-
 [![PyPI - Version](https://img.shields.io/pypi/v/mflux-fasthtml.svg)](https://pypi.org/project/mflux-fasthtml)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mflux-fasthtml.svg)](https://pypi.org/project/mflux-fasthtml)
+
+A web app gui for [mflux](https://pypi.org/project/mflux/) python library implemented with [FastHTML](https://docs.fastht.ml)
 
 -----
 
@@ -14,8 +14,11 @@ A web app gui for [mflux](https://pypi.org/project/mflux/) python library implem
 
 ## Installation
 
-```console
-pip install mflux-fasthtml
+```sh
+brew install uv
+uv tool install mflux-fasthtml
+cd /your/preferred/working/directory
+mflux-fasthtml-app
 ```
 
 ## License
