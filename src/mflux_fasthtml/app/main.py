@@ -1,5 +1,5 @@
 # noqa: F405
-
+import logging
 import os
 import time
 from pathlib import Path
@@ -15,14 +15,20 @@ tailwind_cdn = Script(src="https://cdn.tailwindcss.com")
 
 
 async def startup():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     print("Starting the background worker...")
+    worker.mlx_cleanup()
     worker.image_generator_thread.start()
 
 
 async def shutdown():
     print("Stopping the background worker...")
     worker.stop_event.set()
-    worker.image_generator_thread.join()
+    worker.image_generator_thread.join(timeout=30)
+    worker.mlx_cleanup()
     print("Stopped the background worker...")
 
 

@@ -1,11 +1,31 @@
+import gc
+import logging
 import sys
 import threading
 import time
 from pathlib import Path
 
+import mlx.core.metal as metal
 from mflux import Config, Flux1, ModelConfig, StopImageGenerationException
 
 from mflux_fasthtml.app.storage import gens
+
+logger = logging.getLogger(__name__)
+
+
+def mlx_cleanup():
+    """Cleanup any memory hogging by the prior run."""
+    ops = []
+    if metal.is_available():
+        ops.append(metal.clear_cache)
+        ops.append(metal.reset_peak_memory)
+    ops.append(gc.collect)
+    for cleanup_op in ops:
+        try:
+            cleanup_op()
+        except (RuntimeError, MemoryError, SystemError) as e:
+            logging.exception(e)
+
 
 # Create a global event to signal stopping
 stop_event = threading.Event()
@@ -19,8 +39,6 @@ def background_worker(empty_pause_interval_seconds=5):
     while True:
         try:
             next_gen = gens(where="completed_at IS NULL", limit=1)[0]
-        except RuntimeError:
-            sys.exit(1)
         except IndexError:
             # where-clause returned empty
             time.sleep(empty_pause_interval_seconds)
@@ -30,10 +48,14 @@ def background_worker(empty_pause_interval_seconds=5):
             # a prior job already completed
             gens.update({"completed_at": int(time.time())}, pk_values=[next_gen.uid])
         else:
-            if generate_image(next_gen):
-                gens.update(
-                    {"completed_at": int(time.time())}, pk_values=[next_gen.uid]
-                )
+            try:
+                if generate_image(next_gen):
+                    gens.update(
+                        {"completed_at": int(time.time())}, pk_values=[next_gen.uid]
+                    )
+            except (RuntimeError, MemoryError, SystemError) as e:
+                mlx_cleanup()
+                logging.exception(e)
 
 
 def generate_image(gen):
@@ -64,10 +86,17 @@ def generate_image(gen):
 
         # Save the image
         image.save(path=gen.output, export_json_metadata=gen.metadata)
+        del image
         return True
     except StopImageGenerationException as stop_exc:
         return False
         print(stop_exc)
+    finally:
+        try:
+            del flux
+        except NameError:
+            pass
+        mlx_cleanup()
 
 
 image_generator_thread = threading.Thread(target=background_worker, daemon=True)
